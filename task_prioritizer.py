@@ -29,3 +29,24 @@ class State(NamedTuple):
     remaining: frozenset
 
 
+def hours_done(state: State, tid: str) -> float:
+    total = 0
+    for item in state.scheduled:
+        t = item[0]
+        day = item[1]
+        h = item[2]
+
+        if t == tid:
+            total += h
+
+    return total
+
+def g_cost(state: State, tasks_by_id: dict) -> float:
+    total = 0.0
+    for tid, day_scheduled, chunk_hours in state.scheduled:
+        task = tasks_by_id[tid]
+        fraction = chunk_hours / task.duration if task.duration else 1.0
+        total += fraction * day_scheduled * priority_weight(task)
+    return total / 10.0
+
+
