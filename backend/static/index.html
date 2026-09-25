@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Task Prioritizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="masthead">
+  <h1>Daily Task Prioritizer with AI</h1>
+</header>
+
+<main class="layout">
+
+  <!-- Margin column: add task + settings -->
+  <aside class="margin-col">
+    <section class="panel">
+      <h2>Add a task</h2>
+      <form id="task-form">
+        <label>
+          Task name
+          <input type="text" id="f-name" required placeholder="e.g. DBMS Normalization">
+        </label>
+
+        <div class="field-row">
+          <label>
+            Duration(h)
+            <input type="number" id="f-duration" min="0.25" step="0.25" required value="1">
+          </label>
+          <label>
+            Deadline (date & time)
+            <input type="datetime-local" id="f-deadline" required>
+          </label>
+        </div>
+
+        <label>
+          Prerequisite (optional)
+          <select id="f-prerequisite">
+            <option value="">None</option>
+          </select>
+        </label>
+
+        <div class="sliders">
+          <label>Urgency <span id="f-urgency-val">3</span>
+            <input type="range" id="f-urgency" min="0" max="5" step="1" value="3">
+          </label>
+          <label>Importance <span id="f-importance-val">3</span>
+            <input type="range" id="f-importance" min="0" max="5" step="1" value="3">
+          </label>
+          <label>Difficulty <span id="f-difficulty-val">3</span>
+            <input type="range" id="f-difficulty" min="0" max="5" step="1" value="3">
+          </label>
+          <label>Progress so far <span id="f-progress-val">0</span>
+            <input type="range" id="f-progress" min="0" max="5" step="1" value="0">
+          </label>
+        </div>
+
+        <button type="submit">Add task</button>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Schedule settings</h2>
+      <label>
+        Daily study budget (hrs)
+        <input type="number" id="s-budget" min="0.5" step="0.5" value="3">
+      </label>
+      <label>
+        Plan up to how many days ahead? (safety limit)
+        <input type="number" id="s-horizon" min="1" step="1" value="30">
+      </label>
+      <button id="generate-btn" class="primary">Generate schedule</button>
+      <p id="schedule-message" class="message"></p>
+    </section>
+  </aside>
+
+  <!-- Main column: task ledger + generated schedule -->
+  <section class="main-col">
+
+    <section class="panel">
+      <h2>Your tasks</h2>
+      <table id="task-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Duration</th>
+            <th>Deadline</th>
+            <th>Countdown</th>
+            <th>Prerequisite</th>
+            <th>Priority weight</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="task-table-body">
+          <tr class="empty-row"><td colspan="7">No tasks yet — add one on the left.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Generated schedule</h2>
+      <div id="schedule-board" class="schedule-board">
+        <p class="empty-hint">Add tasks, then generate a schedule to see it laid out here, day by day.</p>
+      </div>
+    </section>
+
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
