@@ -1,5 +1,3 @@
-// All requests go to the same origin the page was served from, so there is
-// no CORS setup needed as long as Flask serves this file too.
 const API = "/api";
 
 const els = {
@@ -20,16 +18,14 @@ const els = {
   horizon: document.getElementById("s-horizon"),
 };
 
-// Wire up the live numeric readout next to each slider.
+
 ["urgency", "importance", "difficulty", "progress"].forEach((field) => {
   const input = els[field];
   const readout = document.getElementById(`f-${field}-val`);
   input.addEventListener("input", () => { readout.textContent = input.value; });
 });
 
-// --------------------------------------------------------------------------
-// Deadline picker defaults (datetime-local, so time-of-day is captured too)
-// --------------------------------------------------------------------------
+
 function describeScheduleDay(isoDate) {
   const d = new Date(isoDate + "T00:00:00");
   const today = new Date();
@@ -66,11 +62,9 @@ function priorityWeight(t) {
   return t.urgency + t.importance + t.difficulty + (5 - t.progress);
 }
 
-// --------------------------------------------------------------------------
-// Load + render tasks
-// --------------------------------------------------------------------------
 
-let lastTasks = [];  // cached for reference; not strictly needed but handy for debugging
+
+let lastTasks = [];  
 
 async function loadTasks() {
   const res = await fetch(`${API}/tasks`);
@@ -146,9 +140,7 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// --------------------------------------------------------------------------
-// Mutations
-// --------------------------------------------------------------------------
+
 
 els.form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -196,9 +188,6 @@ async function completeTask(id) {
   await loadTasks();
 }
 
-// --------------------------------------------------------------------------
-// Schedule generation
-// --------------------------------------------------------------------------
 
 els.generateBtn.addEventListener("click", async () => {
   els.scheduleMessage.textContent = "";
@@ -261,12 +250,8 @@ function renderSchedule(dailyPlan, cost) {
   els.scheduleBoard.appendChild(costEl);
 }
 
-// --------------------------------------------------------------------------
-// Init
-// --------------------------------------------------------------------------
+
 
 loadTasks();
 
-// Countdown auto-refresh: re-fetches tasks periodically so "days/hours/min
-// left" stays correct in real time without the user reloading the page.
 setInterval(loadTasks, 30 * 1000);
