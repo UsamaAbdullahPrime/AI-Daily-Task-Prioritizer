@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Task Prioritizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("tp-theme"); } catch (e) {}
+    if (!t && window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) t = "dark";
+    document.documentElement.dataset.theme = t || "light";
+  })();
+</script>
+</head>
+<body>
+
+<header class="masthead">
+  <h1>AI Daily Task Prioritizer</h1>
+  <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-moon" d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5Z"/><g class="i-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></g></svg>
+    <span id="theme-label">Dark mode</span>
+  </button>
+</header>
+
+<main class="layout">
+
+  <!-- Margin column: add task + settings -->
+  <aside class="margin-col">
+    <section class="panel">
+      <h2>Add a task</h2>
+      <form id="task-form">
+        <label>
+          Task name
+          <input type="text" id="f-name" required placeholder="e.g. DBMS Normalization">
+        </label>
+
+        <div class="field-row">
+          <label>
+            Duration(h)
+            <input type="number" id="f-duration" min="0.25" step="0.25" required value="1">
+          </label>
+          <label>
+            Deadline (date & time)
+            <input type="datetime-local" id="f-deadline" required>
+          </label>
+        </div>
+
+        <label>
+          Prerequisite (optional)
+          <select id="f-prerequisite">
+            <option value="">None</option>
+          </select>
+        </label>
+
+        <div class="sliders">
+          <label>Urgency <span id="f-urgency-val">3</span>
+            <input type="range" id="f-urgency" min="0" max="5" step="1" value="3">
+          </label>
+          <label>Importance <span id="f-importance-val">3</span>
+            <input type="range" id="f-importance" min="0" max="5" step="1" value="3">
+          </label>
+          <label>Difficulty <span id="f-difficulty-val">3</span>
+            <input type="range" id="f-difficulty" min="0" max="5" step="1" value="3">
+          </label>
+          <label>Progress so far <span id="f-progress-val">0</span>
+            <input type="range" id="f-progress" min="0" max="5" step="1" value="0">
+          </label>
+        </div>
+
+        <div class="weight-preview">
+          <span>Priority weight</span>
+          <div class="weight-bar"><span id="f-weight-fill"></span></div>
+          <strong id="f-weight">14</strong>
+        </div>
+
+        <button type="submit">Add task</button>
+        <p id="form-message" class="message"></p>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Schedule settings</h2>
+      <label>
+        Daily study budget (hrs)
+        <input type="number" id="s-budget" min="0.5" step="0.5" value="3">
+      </label>
+      <label>
+        Plan up to how many days ahead? (safety limit)
+        <input type="number" id="s-horizon" min="1" step="1" value="30">
+      </label>
+      <button id="generate-btn" class="primary">Generate schedule</button>
+      <p id="schedule-message" class="message"></p>
+    </section>
+  </aside>
+
+  <!-- Main column: task ledger + generated schedule -->
+  <section class="main-col">
+
+    <section class="panel">
+      <h2>Your tasks</h2>
+      <table id="task-table">
+        <thead>
+          <tr>
+            <th><button type="button" class="sort-btn" data-sort="name">Task</button></th>
+            <th><button type="button" class="sort-btn" data-sort="duration">Duration</button></th>
+            <th><button type="button" class="sort-btn" data-sort="deadline">Deadline</button></th>
+            <th>Countdown</th>
+            <th>Prerequisite</th>
+            <th><button type="button" class="sort-btn" data-sort="weight">Priority weight</button></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="task-table-body">
+          <tr class="empty-row"><td colspan="7">No tasks yet — add one on the left.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Generated schedule</h2>
+      <div id="schedule-board" class="schedule-board">
+        <p class="empty-hint">Add tasks, then generate a schedule to see it laid out here, day by day.</p>
+      </div>
+    </section>
+
+    <section class="panel" id="astar-panel" hidden>
+      <div class="astar-head">
+        <h2>A* search path</h2>
+        <div class="astar-controls">
+          <button type="button" id="astar-reset" title="Back to the start">Start</button>
+          <button type="button" id="astar-prev" title="Previous step">Back</button>
+          <button type="button" id="astar-play" class="primary">Play</button>
+          <button type="button" id="astar-next" title="Next step">Next</button>
+          <button type="button" id="astar-end" title="Show the finished plan">End</button>
+        </div>
+      </div>
+      <p class="astar-note">
+        Each step is one move A* chose from the start state to the goal.
+        g(n) is the cost so far, h(n) estimates the cost of the tasks still left, and
+        A* always expands the state with the lowest f(n) = g(n) + h(n).
+        Click any step to see the schedule at that point.
+      </p>
+      <div class="astar-status" id="astar-status"></div>
+      <div class="astar-table-wrap">
+        <table class="astar-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Action</th>
+              <th class="num">g(n)</th>
+              <th class="num">h(n)</th>
+              <th class="num">f(n)</th>
+            </tr>
+          </thead>
+          <tbody id="astar-steps"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </section>
+
+</main>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
