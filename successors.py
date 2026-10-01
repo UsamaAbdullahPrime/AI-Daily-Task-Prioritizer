@@ -1,4 +1,3 @@
-# PERSON 2 — Successor generation (state transitions)
 from models import EPS, State, hours_done
 
 
