@@ -4,11 +4,11 @@
   --ink: #1E2A3A;
   --ink-soft: #5B6672;
   --line: #D7DCE0;
-  --accent: #B9862E;   /* ochre — priority / urgency */
-  --accent-2: #2F6E62; /* teal — scheduled / positive */
+  --accent: #B9862E;
+  --accent-2: #2F6E62;
   --danger: #A6432C;
-  --highlight: #F6EEDD;  /* linked row / block */
-  --placed: #E2EFEC;     /* A* step just placed */
+  --highlight: #F6EEDD;
+  --placed: #E2EFEC;
   --active-day: #F3F6F5;
   --future: #A3ABB3;
   color-scheme: light;
@@ -17,7 +17,7 @@
   --sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* ---------- Dark mode ---------- */
+
 :root[data-theme="dark"] {
   --bg: #12161C;
   --paper: #1A2028;
@@ -92,7 +92,6 @@ body {
   margin: 0 0 16px;
 }
 
-/* ---------- Forms ---------- */
 
 label {
   display: block;
@@ -176,7 +175,6 @@ button.primary:hover { background: var(--accent-2); border-color: var(--accent-2
   margin: 10px 0 0;
 }
 
-/* ---------- Task ledger table ---------- */
 
 table {
   width: 100%;
@@ -237,7 +235,6 @@ tr.completed td { color: var(--ink-soft); text-decoration: line-through; }
 .countdown.due-soon { color: var(--accent); }
 .countdown.overdue { color: var(--danger); }
 
-/* ---------- Schedule board ---------- */
 
 .schedule-board {
   display: flex;
@@ -301,12 +298,6 @@ tr.completed td { color: var(--ink-soft); text-decoration: line-through; }
   margin-left: 6px;
   vertical-align: middle;
 }
-/* =========================================================
-   Interactive additions
-   ========================================================= */
-
-/* ---------- Live priority weight preview ---------- */
-
 .weight-preview {
   display: grid;
   grid-template-columns: auto 1fr auto;
@@ -343,7 +334,6 @@ button:disabled { opacity: .5; cursor: default; }
 button:disabled:hover { background: var(--paper); color: var(--ink); }
 button.primary:disabled:hover { background: var(--ink); color: var(--paper); }
 
-/* ---------- Sortable table headers ---------- */
 
 .sort-btn {
   width: auto;
@@ -362,7 +352,7 @@ th[aria-sort] .sort-btn { color: var(--ink); }
 th[aria-sort="ascending"] .sort-btn::after { content: " ▲"; font-size: 10px; }
 th[aria-sort="descending"] .sort-btn::after { content: " ▼"; font-size: 10px; }
 
-/* ---------- Linked highlight: table row <-> schedule block ---------- */
+
 
 tbody tr { transition: background-color .15s; }
 tbody tr.linked td { background: var(--highlight); }
@@ -375,7 +365,7 @@ tbody tr.linked td { background: var(--highlight); }
 }
 .day-task.linked { background: var(--highlight); }
 
-/* ---------- A* replay on the schedule board ---------- */
+
 
 .day-task.future { opacity: .18; }
 .day-task.just-placed {
@@ -387,7 +377,6 @@ tbody tr.linked td { background: var(--highlight); }
 .day-page.active-day { background: var(--active-day); }
 .day-page.active-day .day-number { color: var(--accent-2); }
 
-/* ---------- A* search path panel ---------- */
 
 .astar-head {
   display: flex;
@@ -464,7 +453,6 @@ tbody tr.linked td { background: var(--highlight); }
 
 .astar-table .f-val { font-family: var(--serif); font-weight: 600; color: var(--accent); }
 
-/* ---------- Toast ---------- */
 
 .toast {
   position: fixed;
@@ -483,12 +471,10 @@ tbody tr.linked td { background: var(--highlight); }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-/* ---------- Keep the main column inside the window ---------- */
 
 .main-col, .margin-col { min-width: 0; }
 .main-col .panel { overflow-x: auto; }
 
-/* ---------- Small screens ---------- */
 
 @media (max-width: 860px) {
   .layout { grid-template-columns: minmax(0, 1fr); padding: 20px 16px 48px; }
@@ -499,7 +485,6 @@ tbody tr.linked td { background: var(--highlight); }
   * { transition: none !important; }
 }
 
-/* ---------- Theme toggle ---------- */
 
 .masthead {
   display: flex;
@@ -525,7 +510,7 @@ tbody tr.linked td { background: var(--highlight); }
 :root[data-theme="dark"] .theme-toggle .i-moon { display: none; }
 :root[data-theme="dark"] .theme-toggle .i-sun { display: inline; }
 
-/* smooth switch between themes */
+
 body, .masthead, .panel, label input, label select, button, .astar-table thead th {
   transition: background-color .2s, color .2s, border-color .2s;
 }
@@ -533,5 +518,4 @@ body, .masthead, .panel, label input, label select, button, .astar-table thead t
 /* toast stays readable in both themes */
 :root[data-theme="dark"] .toast { background: var(--ink); color: var(--bg); }
 
-/* native date picker icon on dark backgrounds */
 :root[data-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); }
